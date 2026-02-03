@@ -371,7 +371,7 @@ where
     #[inline]
     fn serialize_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeStruct> {
         match name {
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             crate::number::TOKEN => Ok(Compound::Number { ser: self }),
             #[cfg(feature = "raw_value")]
             crate::raw::TOKEN => Ok(Compound::RawValue { ser: self }),
@@ -473,7 +473,7 @@ pub enum Compound<'a, W: 'a, F: 'a> {
         ser: &'a mut Serializer<W, F>,
         state: State,
     },
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     Number { ser: &'a mut Serializer<W, F> },
     #[cfg(feature = "raw_value")]
     RawValue { ser: &'a mut Serializer<W, F> },
@@ -504,7 +504,7 @@ where
                     .end_array_value(&mut ser.writer)
                     .map_err(Error::io)
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             Compound::RawValue { .. } => unreachable!(),
@@ -518,7 +518,7 @@ where
                 State::Empty => Ok(()),
                 _ => ser.formatter.end_array(&mut ser.writer).map_err(Error::io),
             },
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             Compound::RawValue { .. } => unreachable!(),
@@ -600,7 +600,7 @@ where
                     .map_err(Error::io));
                 ser.formatter.end_object(&mut ser.writer).map_err(Error::io)
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             Compound::RawValue { .. } => unreachable!(),
@@ -635,7 +635,7 @@ where
                     .end_object_key(&mut ser.writer)
                     .map_err(Error::io)
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             Compound::RawValue { .. } => unreachable!(),
@@ -658,7 +658,7 @@ where
                     .end_object_value(&mut ser.writer)
                     .map_err(Error::io)
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             Compound::RawValue { .. } => unreachable!(),
@@ -672,7 +672,7 @@ where
                 State::Empty => Ok(()),
                 _ => ser.formatter.end_object(&mut ser.writer).map_err(Error::io),
             },
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             Compound::RawValue { .. } => unreachable!(),
@@ -695,7 +695,7 @@ where
     {
         match self {
             Compound::Map { .. } => ser::SerializeMap::serialize_entry(self, key, value),
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { ser, .. } => {
                 if key == crate::number::TOKEN {
                     value.serialize(NumberStrEmitter(ser))
@@ -718,7 +718,7 @@ where
     fn end(self) -> Result<()> {
         match self {
             Compound::Map { .. } => ser::SerializeMap::end(self),
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { .. } => Ok(()),
             #[cfg(feature = "raw_value")]
             Compound::RawValue { .. } => Ok(()),
@@ -741,7 +741,7 @@ where
     {
         match *self {
             Compound::Map { .. } => ser::SerializeStruct::serialize_field(self, key, value),
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             Compound::RawValue { .. } => unreachable!(),
@@ -762,7 +762,7 @@ where
                     .map_err(Error::io));
                 ser.formatter.end_object(&mut ser.writer).map_err(Error::io)
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             Compound::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             Compound::RawValue { .. } => unreachable!(),
@@ -774,7 +774,7 @@ struct MapKeySerializer<'a, W: 'a, F: 'a> {
     ser: &'a mut Serializer<W, F>,
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 fn invalid_number() -> Error {
     Error::syntax(ErrorCode::InvalidNumber, 0, 0)
 }
@@ -1152,10 +1152,10 @@ where
     }
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 struct NumberStrEmitter<'a, W: 'a + io::Write, F: 'a + Formatter>(&'a mut Serializer<W, F>);
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 impl<'a, W: io::Write, F: Formatter> ser::Serializer for NumberStrEmitter<'a, W, F> {
     type Ok = ();
     type Error = Error;

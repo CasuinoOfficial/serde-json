@@ -22,7 +22,7 @@ from_integer! {
     u8 u16 u32 u64 usize
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 from_integer! {
     i128 u128
 }

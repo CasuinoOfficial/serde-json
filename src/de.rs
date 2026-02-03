@@ -16,7 +16,7 @@ use core::str::FromStr;
 use serde::de::{self, Expected, Unexpected};
 use serde::forward_to_deserialize_any;
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 use crate::number::NumberDeserializer;
 
 pub use crate::read::{Read, SliceRead, StrRead};
@@ -110,7 +110,7 @@ pub(crate) enum ParserNumber {
     F64(f64),
     U64(u64),
     I64(i64),
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     String(String),
 }
 
@@ -123,7 +123,7 @@ impl ParserNumber {
             ParserNumber::F64(x) => visitor.visit_f64(x),
             ParserNumber::U64(x) => visitor.visit_u64(x),
             ParserNumber::I64(x) => visitor.visit_i64(x),
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             ParserNumber::String(x) => visitor.visit_map(NumberDeserializer { number: x.into() }),
         }
     }
@@ -133,7 +133,7 @@ impl ParserNumber {
             ParserNumber::F64(x) => de::Error::invalid_type(Unexpected::Float(x), exp),
             ParserNumber::U64(x) => de::Error::invalid_type(Unexpected::Unsigned(x), exp),
             ParserNumber::I64(x) => de::Error::invalid_type(Unexpected::Signed(x), exp),
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             ParserNumber::String(_) => de::Error::invalid_type(Unexpected::Other("number"), exp),
         }
     }
@@ -929,12 +929,12 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
-    #[cfg(not(feature = "arbitrary_precision"))]
+    #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
     fn parse_any_number(&mut self, positive: bool) -> Result<ParserNumber> {
         self.parse_integer(positive)
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     fn parse_any_number(&mut self, positive: bool) -> Result<ParserNumber> {
         let mut buf = String::with_capacity(16);
         if !positive {
@@ -953,7 +953,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         Ok(ParserNumber::String(buf))
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     fn scan_or_eof(&mut self, buf: &mut String) -> Result<u8> {
         match tri!(self.next_char()) {
             Some(b) => {
@@ -964,7 +964,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     fn scan_integer(&mut self, buf: &mut String) -> Result<()> {
         match tri!(self.scan_or_eof(buf)) {
             b'0' => {
@@ -989,7 +989,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     fn scan_number(&mut self, buf: &mut String) -> Result<()> {
         match tri!(self.peek_or_null()) {
             b'.' => self.scan_decimal(buf),
@@ -998,7 +998,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     fn scan_decimal(&mut self, buf: &mut String) -> Result<()> {
         self.eat_char();
         buf.push('.');
@@ -1023,7 +1023,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     fn scan_exponent(&mut self, buf: &mut String) -> Result<()> {
         self.eat_char();
         buf.push('e');

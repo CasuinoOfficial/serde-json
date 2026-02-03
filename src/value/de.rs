@@ -16,7 +16,7 @@ use serde::de::{
 };
 use serde::forward_to_deserialize_any;
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 use crate::number::NumberFromString;
 
 impl<'de> Deserialize<'de> for Value {
@@ -123,7 +123,7 @@ impl<'de> Deserialize<'de> for Value {
                 V: MapAccess<'de>,
             {
                 match tri!(visitor.next_key_seed(KeyClassifier)) {
-                    #[cfg(feature = "arbitrary_precision")]
+                    #[cfg(feature = "arbitrary_precision_do_not_use")]
                     Some(KeyClass::Number) => {
                         let number: NumberFromString = tri!(visitor.next_value());
                         Ok(Value::Number(number.value))
@@ -168,7 +168,7 @@ impl FromStr for Map<String, Value> {
 
 macro_rules! deserialize_number {
     ($method:ident) => {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         fn $method<V>(self, visitor: V) -> Result<V::Value, Error>
         where
             V: Visitor<'de>,
@@ -179,7 +179,7 @@ macro_rules! deserialize_number {
             }
         }
 
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         fn $method<V>(self, visitor: V) -> Result<V::Value, Error>
         where
             V: Visitor<'de>,
@@ -704,7 +704,7 @@ impl<'de> MapAccess<'de> for MapDeserializer {
 
 macro_rules! deserialize_value_ref_number {
     ($method:ident) => {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         fn $method<V>(self, visitor: V) -> Result<V::Value, Error>
         where
             V: Visitor<'de>,
@@ -715,7 +715,7 @@ macro_rules! deserialize_value_ref_number {
             }
         }
 
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         fn $method<V>(self, visitor: V) -> Result<V::Value, Error>
         where
             V: Visitor<'de>,
@@ -1330,7 +1330,7 @@ struct KeyClassifier;
 
 enum KeyClass {
     Map(String),
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     Number,
     #[cfg(feature = "raw_value")]
     RawValue,
@@ -1359,7 +1359,7 @@ impl<'de> Visitor<'de> for KeyClassifier {
         E: de::Error,
     {
         match s {
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             crate::number::TOKEN => Ok(KeyClass::Number),
             #[cfg(feature = "raw_value")]
             crate::raw::TOKEN => Ok(KeyClass::RawValue),
@@ -1373,7 +1373,7 @@ impl<'de> Visitor<'de> for KeyClassifier {
         E: de::Error,
     {
         match s.as_str() {
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             crate::number::TOKEN => Ok(KeyClass::Number),
             #[cfg(feature = "raw_value")]
             crate::raw::TOKEN => Ok(KeyClass::RawValue),

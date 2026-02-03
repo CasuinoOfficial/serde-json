@@ -1,20 +1,20 @@
 use crate::de::ParserNumber;
 use crate::error::Error;
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 use crate::error::ErrorCode;
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 use alloc::borrow::ToOwned;
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 use alloc::string::{String, ToString};
 use core::fmt::{self, Debug, Display};
-#[cfg(not(feature = "arbitrary_precision"))]
+#[cfg(not(feature = "arbitrary_precision_do_not_use"))]
 use core::hash::{Hash, Hasher};
 use serde::de::{self, Unexpected, Visitor};
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 use serde::de::{IntoDeserializer, MapAccess};
 use serde::{forward_to_deserialize_any, Deserialize, Deserializer, Serialize, Serializer};
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 pub(crate) const TOKEN: &str = "$serde_json::private::Number";
 
 /// Represents a JSON number, whether integer or floating point.
@@ -23,7 +23,7 @@ pub struct Number {
     n: N,
 }
 
-#[cfg(not(feature = "arbitrary_precision"))]
+#[cfg(not(feature = "arbitrary_precision_do_not_use"))]
 #[derive(Copy, Clone)]
 enum N {
     PosInt(u64),
@@ -33,7 +33,7 @@ enum N {
     Float(f64),
 }
 
-#[cfg(not(feature = "arbitrary_precision"))]
+#[cfg(not(feature = "arbitrary_precision_do_not_use"))]
 impl PartialEq for N {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
@@ -46,10 +46,10 @@ impl PartialEq for N {
 }
 
 // Implementing Eq is fine since any float values are always finite.
-#[cfg(not(feature = "arbitrary_precision"))]
+#[cfg(not(feature = "arbitrary_precision_do_not_use"))]
 impl Eq for N {}
 
-#[cfg(not(feature = "arbitrary_precision"))]
+#[cfg(not(feature = "arbitrary_precision_do_not_use"))]
 impl Hash for N {
     fn hash<H: Hasher>(&self, h: &mut H) {
         match *self {
@@ -69,7 +69,7 @@ impl Hash for N {
     }
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 type N = String;
 
 impl Number {
@@ -79,13 +79,13 @@ impl Number {
     /// For any Number on which `is_i64` returns true, `as_i64` is guaranteed to
     /// return the integer value.
     pub fn is_i64(&self) -> bool {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         match self.n {
             N::PosInt(v) => v <= i64::MAX as u64,
             N::NegInt(_) => true,
             N::Float(_) => false,
         }
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         self.as_i64().is_some()
     }
 
@@ -94,12 +94,12 @@ impl Number {
     /// For any Number on which `is_u64` returns true, `as_u64` is guaranteed to
     /// return the integer value.
     pub fn is_u64(&self) -> bool {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         match self.n {
             N::PosInt(_) => true,
             N::NegInt(_) | N::Float(_) => false,
         }
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         self.as_u64().is_some()
     }
 
@@ -111,12 +111,12 @@ impl Number {
     /// Currently this function returns true if and only if both `is_i64` and
     /// `is_u64` return false but this is not a guarantee in the future.
     pub fn is_f64(&self) -> bool {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         match self.n {
             N::Float(_) => true,
             N::PosInt(_) | N::NegInt(_) => false,
         }
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         {
             for c in self.n.chars() {
                 if c == '.' || c == 'e' || c == 'E' {
@@ -130,7 +130,7 @@ impl Number {
     /// If the `Number` is an integer, represent it as i64 if possible. Returns
     /// None otherwise.
     pub fn as_i64(&self) -> Option<i64> {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         match self.n {
             N::PosInt(n) => {
                 if n <= i64::MAX as u64 {
@@ -142,31 +142,31 @@ impl Number {
             N::NegInt(n) => Some(n),
             N::Float(_) => None,
         }
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         self.n.parse().ok()
     }
 
     /// If the `Number` is an integer, represent it as u64 if possible. Returns
     /// None otherwise.
     pub fn as_u64(&self) -> Option<u64> {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         match self.n {
             N::PosInt(n) => Some(n),
             N::NegInt(_) | N::Float(_) => None,
         }
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         self.n.parse().ok()
     }
 
     /// Represents the number as f64 if possible. Returns None otherwise.
     pub fn as_f64(&self) -> Option<f64> {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         match self.n {
             N::PosInt(n) => Some(n as f64),
             N::NegInt(n) => Some(n as f64),
             N::Float(n) => Some(n),
         }
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         self.n.parse::<f64>().ok().filter(|float| float.is_finite())
     }
 
@@ -183,11 +183,11 @@ impl Number {
     pub fn from_f64(f: f64) -> Option<Number> {
         if f.is_finite() {
             let n = {
-                #[cfg(not(feature = "arbitrary_precision"))]
+                #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
                 {
                     N::Float(f)
                 }
-                #[cfg(feature = "arbitrary_precision")]
+                #[cfg(feature = "arbitrary_precision_do_not_use")]
                 {
                     zmij::Buffer::new().format_finite(f).to_owned()
                 }
@@ -201,31 +201,31 @@ impl Number {
     /// If the `Number` is an integer, represent it as i128 if possible. Returns
     /// None otherwise.
     pub fn as_i128(&self) -> Option<i128> {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         match self.n {
             N::PosInt(n) => Some(n as i128),
             N::NegInt(n) => Some(n as i128),
             N::Float(_) => None,
         }
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         self.n.parse().ok()
     }
 
     /// If the `Number` is an integer, represent it as u128 if possible. Returns
     /// None otherwise.
     pub fn as_u128(&self) -> Option<u128> {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         match self.n {
             N::PosInt(n) => Some(n as u128),
             N::NegInt(_) | N::Float(_) => None,
         }
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         self.n.parse().ok()
     }
 
     /// Converts an `i128` to a `Number`. Numbers smaller than i64::MIN or
     /// larger than u64::MAX can only be represented in `Number` if serde_json's
-    /// "arbitrary_precision" feature is enabled.
+    /// "arbitrary_precision_do_not_use" feature is enabled.
     ///
     /// ```
     /// # use serde_json::Number;
@@ -234,7 +234,7 @@ impl Number {
     /// ```
     pub fn from_i128(i: i128) -> Option<Number> {
         let n = {
-            #[cfg(not(feature = "arbitrary_precision"))]
+            #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
             {
                 if let Ok(u) = u64::try_from(i) {
                     N::PosInt(u)
@@ -244,7 +244,7 @@ impl Number {
                     return None;
                 }
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             {
                 i.to_string()
             }
@@ -253,7 +253,7 @@ impl Number {
     }
 
     /// Converts a `u128` to a `Number`. Numbers greater than u64::MAX can only
-    /// be represented in `Number` if serde_json's "arbitrary_precision" feature
+    /// be represented in `Number` if serde_json's "arbitrary_precision_do_not_use" feature
     /// is enabled.
     ///
     /// ```
@@ -263,7 +263,7 @@ impl Number {
     /// ```
     pub fn from_u128(i: u128) -> Option<Number> {
         let n = {
-            #[cfg(not(feature = "arbitrary_precision"))]
+            #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
             {
                 if let Ok(u) = u64::try_from(i) {
                     N::PosInt(u)
@@ -271,7 +271,7 @@ impl Number {
                     return None;
                 }
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             {
                 i.to_string()
             }
@@ -303,31 +303,31 @@ impl Number {
     ///     assert_eq!(number.as_str(), value);
     /// }
     /// ```
-    #[cfg(feature = "arbitrary_precision")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "arbitrary_precision")))]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "arbitrary_precision_do_not_use")))]
     pub fn as_str(&self) -> &str {
         &self.n
     }
 
     pub(crate) fn as_f32(&self) -> Option<f32> {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         match self.n {
             N::PosInt(n) => Some(n as f32),
             N::NegInt(n) => Some(n as f32),
             N::Float(n) => Some(n as f32),
         }
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         self.n.parse::<f32>().ok().filter(|float| float.is_finite())
     }
 
     pub(crate) fn from_f32(f: f32) -> Option<Number> {
         if f.is_finite() {
             let n = {
-                #[cfg(not(feature = "arbitrary_precision"))]
+                #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
                 {
                     N::Float(f as f64)
                 }
-                #[cfg(feature = "arbitrary_precision")]
+                #[cfg(feature = "arbitrary_precision_do_not_use")]
                 {
                     zmij::Buffer::new().format_finite(f).to_owned()
                 }
@@ -338,7 +338,7 @@ impl Number {
         }
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     /// Not public API. Only tests use this.
     #[doc(hidden)]
     #[inline]
@@ -348,7 +348,7 @@ impl Number {
 }
 
 impl Display for Number {
-    #[cfg(not(feature = "arbitrary_precision"))]
+    #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self.n {
             N::PosInt(u) => formatter.write_str(itoa::Buffer::new().format(u)),
@@ -357,7 +357,7 @@ impl Display for Number {
         }
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         Display::fmt(&self.n, formatter)
     }
@@ -370,7 +370,7 @@ impl Debug for Number {
 }
 
 impl Serialize for Number {
-    #[cfg(not(feature = "arbitrary_precision"))]
+    #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -382,7 +382,7 @@ impl Serialize for Number {
         }
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -441,7 +441,7 @@ impl<'de> Deserialize<'de> for Number {
                 Number::from_f64(value).ok_or_else(|| de::Error::custom("not a JSON number"))
             }
 
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             fn visit_map<V>(self, mut visitor: V) -> Result<Number, V::Error>
             where
                 V: de::MapAccess<'de>,
@@ -459,10 +459,10 @@ impl<'de> Deserialize<'de> for Number {
     }
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 struct NumberKey;
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 impl<'de> de::Deserialize<'de> for NumberKey {
     fn deserialize<D>(deserializer: D) -> Result<NumberKey, D::Error>
     where
@@ -494,12 +494,12 @@ impl<'de> de::Deserialize<'de> for NumberKey {
     }
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 pub struct NumberFromString {
     pub value: Number,
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 impl<'de> de::Deserialize<'de> for NumberFromString {
     fn deserialize<D>(deserializer: D) -> Result<NumberFromString, D::Error>
     where
@@ -527,14 +527,14 @@ impl<'de> de::Deserialize<'de> for NumberFromString {
     }
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 fn invalid_number() -> Error {
     Error::syntax(ErrorCode::InvalidNumber, 0, 0)
 }
 
 macro_rules! deserialize_any {
     (@expand [$($num_string:tt)*]) => {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Error>
         where
             V: Visitor<'de>,
@@ -546,7 +546,7 @@ macro_rules! deserialize_any {
             }
         }
 
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Error>
             where V: Visitor<'de>
         {
@@ -581,7 +581,7 @@ macro_rules! deserialize_any {
 
 macro_rules! deserialize_number {
     ($deserialize:ident => $visit:ident) => {
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         fn $deserialize<V>(self, visitor: V) -> Result<V::Value, Error>
         where
             V: Visitor<'de>,
@@ -589,7 +589,7 @@ macro_rules! deserialize_number {
             self.deserialize_any(visitor)
         }
 
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         fn $deserialize<V>(self, visitor: V) -> Result<V::Value, Error>
         where
             V: de::Visitor<'de>,
@@ -649,12 +649,12 @@ impl<'de> Deserializer<'de> for &Number {
     }
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 pub(crate) struct NumberDeserializer {
     pub number: Option<String>,
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 impl<'de> MapAccess<'de> for NumberDeserializer {
     type Error = Error;
 
@@ -676,10 +676,10 @@ impl<'de> MapAccess<'de> for NumberDeserializer {
     }
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 struct NumberFieldDeserializer;
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 impl<'de> Deserializer<'de> for NumberFieldDeserializer {
     type Error = Error;
 
@@ -701,36 +701,36 @@ impl From<ParserNumber> for Number {
     fn from(value: ParserNumber) -> Self {
         let n = match value {
             ParserNumber::F64(f) => {
-                #[cfg(not(feature = "arbitrary_precision"))]
+                #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
                 {
                     N::Float(f)
                 }
-                #[cfg(feature = "arbitrary_precision")]
+                #[cfg(feature = "arbitrary_precision_do_not_use")]
                 {
                     zmij::Buffer::new().format_finite(f).to_owned()
                 }
             }
             ParserNumber::U64(u) => {
-                #[cfg(not(feature = "arbitrary_precision"))]
+                #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
                 {
                     N::PosInt(u)
                 }
-                #[cfg(feature = "arbitrary_precision")]
+                #[cfg(feature = "arbitrary_precision_do_not_use")]
                 {
                     itoa::Buffer::new().format(u).to_owned()
                 }
             }
             ParserNumber::I64(i) => {
-                #[cfg(not(feature = "arbitrary_precision"))]
+                #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
                 {
                     N::NegInt(i)
                 }
-                #[cfg(feature = "arbitrary_precision")]
+                #[cfg(feature = "arbitrary_precision_do_not_use")]
                 {
                     itoa::Buffer::new().format(i).to_owned()
                 }
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             ParserNumber::String(s) => s,
         };
         Number { n }
@@ -745,9 +745,9 @@ macro_rules! impl_from_unsigned {
             impl From<$ty> for Number {
                 fn from(u: $ty) -> Self {
                     let n = {
-                        #[cfg(not(feature = "arbitrary_precision"))]
+                        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
                         { N::PosInt(u as u64) }
-                        #[cfg(feature = "arbitrary_precision")]
+                        #[cfg(feature = "arbitrary_precision_do_not_use")]
                         {
                             itoa::Buffer::new().format(u).to_owned()
                         }
@@ -767,7 +767,7 @@ macro_rules! impl_from_signed {
             impl From<$ty> for Number {
                 fn from(i: $ty) -> Self {
                     let n = {
-                        #[cfg(not(feature = "arbitrary_precision"))]
+                        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
                         {
                             if i < 0 {
                                 N::NegInt(i as i64)
@@ -775,7 +775,7 @@ macro_rules! impl_from_signed {
                                 N::PosInt(i as u64)
                             }
                         }
-                        #[cfg(feature = "arbitrary_precision")]
+                        #[cfg(feature = "arbitrary_precision_do_not_use")]
                         {
                             itoa::Buffer::new().format(i).to_owned()
                         }
@@ -790,13 +790,13 @@ macro_rules! impl_from_signed {
 impl_from_unsigned!(u8, u16, u32, u64, usize);
 impl_from_signed!(i8, i16, i32, i64, isize);
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 impl_from_unsigned!(u128);
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 impl_from_signed!(i128);
 
 impl Number {
-    #[cfg(not(feature = "arbitrary_precision"))]
+    #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
     #[cold]
     pub(crate) fn unexpected(&self) -> Unexpected {
         match self.n {
@@ -806,7 +806,7 @@ impl Number {
         }
     }
 
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     #[cold]
     pub(crate) fn unexpected(&self) -> Unexpected {
         Unexpected::Other("number")

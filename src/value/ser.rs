@@ -94,12 +94,12 @@ impl serde::Serializer for Serializer {
     }
 
     fn serialize_i128(self, value: i128) -> Result<Value> {
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         {
             Ok(Value::Number(value.into()))
         }
 
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         {
             if let Ok(value) = u64::try_from(value) {
                 Ok(Value::Number(value.into()))
@@ -132,12 +132,12 @@ impl serde::Serializer for Serializer {
     }
 
     fn serialize_u128(self, value: u128) -> Result<Value> {
-        #[cfg(feature = "arbitrary_precision")]
+        #[cfg(feature = "arbitrary_precision_do_not_use")]
         {
             Ok(Value::Number(value.into()))
         }
 
-        #[cfg(not(feature = "arbitrary_precision"))]
+        #[cfg(not(feature = "arbitrary_precision_do_not_use"))]
         {
             if let Ok(value) = u64::try_from(value) {
                 Ok(Value::Number(value.into()))
@@ -270,7 +270,7 @@ impl serde::Serializer for Serializer {
 
     fn serialize_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeStruct> {
         match name {
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             crate::number::TOKEN => Ok(SerializeMap::Number { out_value: None }),
             #[cfg(feature = "raw_value")]
             crate::raw::TOKEN => Ok(SerializeMap::RawValue { out_value: None }),
@@ -313,7 +313,7 @@ pub enum SerializeMap {
         map: Map<String, Value>,
         next_key: Option<String>,
     },
-    #[cfg(feature = "arbitrary_precision")]
+    #[cfg(feature = "arbitrary_precision_do_not_use")]
     Number { out_value: Option<Value> },
     #[cfg(feature = "raw_value")]
     RawValue { out_value: Option<Value> },
@@ -407,7 +407,7 @@ impl serde::ser::SerializeMap for SerializeMap {
                 *next_key = Some(tri!(key.serialize(MapKeySerializer)));
                 Ok(())
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             SerializeMap::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             SerializeMap::RawValue { .. } => unreachable!(),
@@ -427,7 +427,7 @@ impl serde::ser::SerializeMap for SerializeMap {
                 map.insert(key, tri!(to_value(value)));
                 Ok(())
             }
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             SerializeMap::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             SerializeMap::RawValue { .. } => unreachable!(),
@@ -437,7 +437,7 @@ impl serde::ser::SerializeMap for SerializeMap {
     fn end(self) -> Result<Value> {
         match self {
             SerializeMap::Map { map, .. } => Ok(Value::Object(map)),
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             SerializeMap::Number { .. } => unreachable!(),
             #[cfg(feature = "raw_value")]
             SerializeMap::RawValue { .. } => unreachable!(),
@@ -657,7 +657,7 @@ impl serde::ser::SerializeStruct for SerializeMap {
     {
         match self {
             SerializeMap::Map { .. } => serde::ser::SerializeMap::serialize_entry(self, key, value),
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             SerializeMap::Number { out_value } => {
                 if key == crate::number::TOKEN {
                     *out_value = Some(tri!(value.serialize(NumberValueEmitter)));
@@ -681,7 +681,7 @@ impl serde::ser::SerializeStruct for SerializeMap {
     fn end(self) -> Result<Value> {
         match self {
             SerializeMap::Map { .. } => serde::ser::SerializeMap::end(self),
-            #[cfg(feature = "arbitrary_precision")]
+            #[cfg(feature = "arbitrary_precision_do_not_use")]
             SerializeMap::Number { out_value, .. } => {
                 Ok(out_value.expect("number value was not emitted"))
             }
@@ -714,15 +714,15 @@ impl serde::ser::SerializeStructVariant for SerializeStructVariant {
     }
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 struct NumberValueEmitter;
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 fn invalid_number() -> Error {
     Error::syntax(ErrorCode::InvalidNumber, 0, 0)
 }
 
-#[cfg(feature = "arbitrary_precision")]
+#[cfg(feature = "arbitrary_precision_do_not_use")]
 impl serde::ser::Serializer for NumberValueEmitter {
     type Ok = Value;
     type Error = Error;
